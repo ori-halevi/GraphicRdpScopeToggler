@@ -21,32 +21,22 @@
 
                 <Button Grid.Row="0" Grid.Column="0"
                         Content="Open for all"
-                        Padding="5"
-                        Margin="5"
                         Command="{Binding OpenForAllCommand}"
                 />
                 <Button Grid.Row="0" Grid.Column="1"
                         Content="Close for all"
-                        Padding="5"
-                        Margin="5"
                         Command="{Binding CloseForAllCommand}"
                 />
                 <Button Grid.Row="1" Grid.Column="0"
                         Content="Open for white list"
-                        Padding="5"
-                        Margin="5"
                         Command="{Binding OpenForWhiteListCommand}"
                 />
                 <Button Grid.Row="1" Grid.Column="1"
                         Content="Open for local computers"
-                        Padding="5"
-                        Margin="5"
                         Command="{Binding OpenForLocalComputersCommand}"
                 />
                 <Button Grid.Row="2" Grid.Column="0"
                         Content="Open for local computers and for white list"
-                        Padding="5"
-                        Margin="5"
                         Command="{Binding OpenForLocalComputersAndForWhiteListCommand}"
                 />
             </Grid>

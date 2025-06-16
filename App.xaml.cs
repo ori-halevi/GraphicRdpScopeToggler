@@ -30,7 +30,7 @@ namespace GraphicRdpScopeToggler
         {
             base.OnStartup(e);
             notifyIcon = new NotifyIcon();
-            notifyIcon.Icon = new Icon("Resources/remote-desktop.ico");
+            notifyIcon.Icon = new Icon("Assets/remote-desktop.ico");
             notifyIcon.Visible = true;
             notifyIcon.Text = "השם של התוכנה שלך";
 

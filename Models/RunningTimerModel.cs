@@ -28,6 +28,8 @@ namespace GraphicRdpScopeToggler.Models
         }
 
         public ICommand CancelCommand { get; set; }
+        public ICommand AddFiveCommand { get; set; }
+        public ICommand AbstractFiveCommand { get; set; }
 
         private readonly Action<RunningTimerModel> onCancel;
         private readonly Action onFinish;
@@ -47,6 +49,32 @@ namespace GraphicRdpScopeToggler.Models
                 cts.Cancel();
                 onCancel?.Invoke(this);
             });
+
+            AddFiveCommand = new DelegateCommand(() =>
+            {
+                TimeLeft = TimeLeft.Add(TimeSpan.FromMinutes(5));
+            });
+
+            AbstractFiveCommand = new DelegateCommand(() =>
+            {
+                if (TimeLeft > TimeSpan.FromMinutes(5))
+                {
+                    TimeLeft = TimeLeft.Subtract(TimeSpan.FromMinutes(5));
+                }
+                else
+                {
+                    TimeLeft = TimeSpan.Zero;
+
+                    // נבטל את הטיימר כדי לעצור את הלולאה
+                    cts.Cancel();
+
+                    // נריץ את onFinish כמו בסיום רגיל
+                    onFinish?.Invoke();
+                    onCancel?.Invoke(this); // הסרה מרשימה או פעולה נוספת
+                }
+            });
+
+
 
             StartTimerAsync();
         }
