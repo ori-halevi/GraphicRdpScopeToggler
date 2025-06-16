@@ -35,6 +35,7 @@
                         Content="Open for white list"
                         Padding="5"
                         Margin="5"
+                        Command="{Binding OpenForWhiteListCommand}"
                 />
                 <Button Grid.Row="1" Grid.Column="1"
                         Content="Open for local computers"
@@ -46,6 +47,7 @@
                         Content="Open for local computers and for white list"
                         Padding="5"
                         Margin="5"
+                        Command="{Binding OpenForLocalComputersAndForWhiteListCommand}"
                 />
             </Grid>
 

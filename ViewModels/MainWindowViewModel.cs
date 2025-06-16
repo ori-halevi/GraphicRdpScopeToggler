@@ -12,6 +12,8 @@ using static System.Windows.Forms.Design.AxImporter;
 using System.Diagnostics;
 using System.Data;
 using GraphicRdpScopeToggler.Models;
+using GraphicRdpScopeToggler.Services.FilesService;
+using System.Collections.Generic;
 
 namespace GraphicRdpScopeToggler.ViewModels
 {
@@ -53,7 +55,9 @@ namespace GraphicRdpScopeToggler.ViewModels
         public ICommand StartCommand { get; set; }
         public ICommand OpenForAllCommand { get; set; }
         public ICommand CloseForAllCommand { get; set; }
+        public ICommand OpenForWhiteListCommand { get; set; }
         public ICommand OpenForLocalComputersCommand { get; set; }
+        public ICommand OpenForLocalComputersAndForWhiteListCommand { get; set; }
 
         #endregion
 
@@ -77,7 +81,19 @@ namespace GraphicRdpScopeToggler.ViewModels
             StartCommand = new DelegateCommand(StartCountDownTask);
             OpenForAllCommand = new DelegateCommand(OpenForAll);
             CloseForAllCommand = new DelegateCommand(CloseForAll);
+            OpenForWhiteListCommand = new DelegateCommand(OpenForWhiteList);
             OpenForLocalComputersCommand = new DelegateCommand(OpenForLocalComputers);
+            OpenForLocalComputersAndForWhiteListCommand = new DelegateCommand(OpenForLocalComputersAndForWhiteList);
+        }
+
+        private void OpenForLocalComputersAndForWhiteList()
+        {
+            _rdpService.OpenRdpForLocalComputersAndForWhiteList();
+        }
+
+        private void OpenForWhiteList()
+        {
+            _rdpService.OpenRdpForWhiteList();
         }
 
         private void OpenForLocalComputers()
@@ -97,21 +113,27 @@ namespace GraphicRdpScopeToggler.ViewModels
 
         private void StartCountDownTask()
         {
+            int hours = int.Parse(CountDownHour);
+            int minutes = int.Parse(CountDownMinute);
+            var duration = new TimeSpan(hours, minutes, 0);
 
             switch (SelectedAction)
             {
                 case "Open for white list":
+                    var openRdpForWhiteListTimer = new RunningTimerModel(duration, (t) => ActiveTimers.Remove(t), _rdpService.OpenRdpForWhiteList, "Open for white list");
+                    ActiveTimers.Add(openRdpForWhiteListTimer);
                     break;
                 case "Open for local computers":
+                    var openRdpForLocalComputersTimer = new RunningTimerModel(duration, (t) => ActiveTimers.Remove(t), _rdpService.OpenRdpForLocalComputers, "Open for local computers");
+                    ActiveTimers.Add(openRdpForLocalComputersTimer);
                     break;
                 case "Open for local computers and for white list":
+                    var openRdpForLocalComputersAndForWhiteListTimer = new RunningTimerModel(duration, (t) => ActiveTimers.Remove(t), _rdpService.OpenRdpForLocalComputersAndForWhiteList, "Open for local computers and for white list");
+                    ActiveTimers.Add(openRdpForLocalComputersAndForWhiteListTimer);
                     break;
                 case "Open for all":
-                    int hours = int.Parse(CountDownHour);
-                    int minutes = int.Parse(CountDownMinute);
-                    var duration = new TimeSpan(hours, minutes, 0);
-                    var timer = new RunningTimerModel(duration, (t) => ActiveTimers.Remove(t), _rdpService.OpenRdpForAll);
-                    ActiveTimers.Add(timer);
+                    var openRdpForAllTimer = new RunningTimerModel(duration, (t) => ActiveTimers.Remove(t), _rdpService.OpenRdpForAll, "Open for all");
+                    ActiveTimers.Add(openRdpForAllTimer);
                     /*_ = Task.Run(async () =>
                     {
                         await Task.Delay(TimeSpan.Parse($"{CountDownHour}:{CountDownMinute}"));
@@ -121,13 +143,8 @@ namespace GraphicRdpScopeToggler.ViewModels
                     });*/
                     break;
                 case "Close for all":
-                    _ = Task.Run(async () =>
-                    {
-                        await Task.Delay(TimeSpan.Parse($"{CountDownHour}:{CountDownMinute}"));
-                        _rdpService.CloseRdpForAll();
-                        Console.WriteLine("Changed to: 192.168.0.0-192.168.255.255");
-                        MessageBox.Show("Changed to: 192.168.0.0-192.168.255.255");
-                    });
+                    var closeRdpForAllTimer = new RunningTimerModel(duration, (t) => ActiveTimers.Remove(t), _rdpService.CloseRdpForAll, "Close for all");
+                    ActiveTimers.Add(closeRdpForAllTimer);
                     break;
 
                 default:

@@ -3,14 +3,20 @@ using System.Net.Sockets;
 using System;
 using System.Diagnostics;
 using NetFwTypeLib;
-using System.Threading.Tasks;
 using System.Linq;
 using System.Windows;
+using GraphicRdpScopeToggler.Services.FilesService;
+using System.Collections.Generic;
 
 namespace GraphicRdpScopeToggler.Services.RdpService
 {
     public class RdpService : IRdpService
     {
+        private readonly IFilesService _filesService;
+        public RdpService(IFilesService filesService)
+        {
+            _filesService = filesService;
+        }
 
 
         public void CloseRdpForAll()
@@ -179,6 +185,88 @@ namespace GraphicRdpScopeToggler.Services.RdpService
                     return false;
                 }
             }
+        }
+
+        public void OpenRdpForWhiteList()
+        {
+            List<string> ipList = _filesService.GetWhiteList();
+            if (ipList.FirstOrDefault() == null) { return; }
+            string result = string.Join(",", ipList.Select(ip => $"{ip}/255.255.255.255"));
+
+            int? port = GetRdpPort();
+            if (port == null) return;
+            string protocolTcp = "6"; // TCP protocol number
+            bool didFound = false;
+
+            var fwPolicy2 = (INetFwPolicy2)Activator.CreateInstance(
+                Type.GetTypeFromProgID("HNetCfg.FwPolicy2"));
+
+            foreach (INetFwRule rule in fwPolicy2.Rules)
+            {
+                // נוודא שזה חוק TCP עם פורט תואם
+                if (rule.Protocol.ToString() == protocolTcp &&
+                    rule.LocalPorts != null &&
+                    rule.LocalPorts.Split(',').Any(p => p.Trim() == port.ToString()))
+                {
+                    string ruleName = rule.Name;
+                    didFound = true;
+
+                    rule.Enabled = true;
+
+                    Debug.WriteLine($"Rule found: {ruleName}");
+                    Debug.WriteLine($"Current RemoteAddresses: {rule.RemoteAddresses}");
+
+                    rule.RemoteAddresses = result;
+                    Debug.WriteLine("Changed to WhiteList");
+                    MessageBox.Show($"Rule Name: {ruleName} Changed to: WhiteList");
+                }
+            }
+
+            if (!didFound)
+                MessageBox.Show($"No firewall rule found for port {port}");
+        }
+
+        public void OpenRdpForLocalComputersAndForWhiteList()
+        {
+            List<string> ipList = _filesService.GetWhiteList();
+            if (ipList.FirstOrDefault() == null) { return; }
+            string result = string.Join(",", ipList.Select(ip => $"{ip}/255.255.255.255"));
+
+            int? port = GetRdpPort();
+            if (port == null) return;
+            string protocolTcp = "6"; // TCP protocol number
+            bool didFound = false;
+
+            var fwPolicy2 = (INetFwPolicy2)Activator.CreateInstance(
+                Type.GetTypeFromProgID("HNetCfg.FwPolicy2"));
+
+            foreach (INetFwRule rule in fwPolicy2.Rules)
+            {
+                // נוודא שזה חוק TCP עם פורט תואם
+                if (rule.Protocol.ToString() == protocolTcp &&
+                    rule.LocalPorts != null &&
+                    rule.LocalPorts.Split(',').Any(p => p.Trim() == port.ToString()))
+                {
+                    string ruleName = rule.Name;
+                    didFound = true;
+
+                    rule.Enabled = true;
+
+                    Debug.WriteLine($"Rule found: {ruleName}");
+                    Debug.WriteLine($"Current RemoteAddresses: {rule.RemoteAddresses}");
+
+                    string remoteAddresses = "192.168.0.0-192.168.255.255";
+                    remoteAddresses += ",";
+                    remoteAddresses += result;
+                    rule.RemoteAddresses = remoteAddresses;
+
+                    Debug.WriteLine("Changed to WhiteList");
+                    MessageBox.Show($"Rule Name: {ruleName} Changed to: WhiteList");
+                }
+            }
+
+            if (!didFound)
+                MessageBox.Show($"No firewall rule found for port {port}");
         }
     }
 }

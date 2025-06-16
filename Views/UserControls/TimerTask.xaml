@@ -9,6 +9,7 @@
         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
             <TextBlock Text="{Binding TimeLeft}" FontSize="24" Margin="0 0 10 0"/>
             <Button Content="Cancel" Command="{Binding CancelCommand}"/>
+            <TextBlock Text="{Binding TaskTitle}" />
         </StackPanel>
     </Border>
     

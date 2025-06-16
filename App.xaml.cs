@@ -5,6 +5,7 @@ using Prism.Ioc;
 
 using System.Windows.Forms;
 using System.Drawing;
+using GraphicRdpScopeToggler.Services.FilesService;
 
 namespace GraphicRdpScopeToggler
 {
@@ -22,6 +23,7 @@ namespace GraphicRdpScopeToggler
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
             containerRegistry.RegisterSingleton<IRdpService, RdpService>();
+            containerRegistry.RegisterSingleton<IFilesService, FilesService>();
         }
 
         protected override void OnStartup(StartupEventArgs e)
