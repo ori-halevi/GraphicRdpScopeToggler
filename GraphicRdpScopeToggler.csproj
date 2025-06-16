@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net6.0-windows</TargetFramework>
+		<UseWPF>true</UseWPF>
+		<UseWindowsForms>true</UseWindowsForms>
+		<!-- 👈 זה מה שהיה חסר -->
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Prism.Unity" Version="8.1.97" />
+		<PackageReference Include="vocaluxe.dependencies.netfwtypelib" Version="1.0.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="ViewModels\UserControls\" />
+	</ItemGroup>
+
+</Project>
